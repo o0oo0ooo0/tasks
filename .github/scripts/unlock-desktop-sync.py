@@ -52,7 +52,6 @@ def patch_add_account_screen():
         '\n'
         '                    if (configuration.supportsOpenTasks) add(Platform.DAVX5)'
     )
-    # Match both `buildList {` and `buildList<Platform> {` so it is idempotent.
     src = re.sub(
         r'val proAccounts = buildList(?:<Platform>)? \{.*?\}',
         'val proAccounts = buildList<Platform> {' + pro_block + '\n                }',
@@ -64,7 +63,35 @@ def patch_add_account_screen():
     print(f"Patched {path}")
 
 
+def patch_app_kt():
+    """Remove the pricing redirect that blocks CalDAV/Etebase/Google/MS sign-in
+    when the user does not have a Pro subscription (App.kt onboarding flow)."""
+    path = os.path.join(ROOT, 'composeApp/src/commonMain/kotlin/org/tasks/App.kt')
+    src = open(path, encoding='utf-8').read()
+
+    block = (
+        '                                val sellsSubscriptions = configuration.billingProvider == org.tasks.billing.BillingProvider.PADDLE\n'
+        '                                    || configuration.appStore == AppStore.APP_STORE\n'
+        '                                if (sellsSubscriptions && !addAccountViewModel.hasPro) {\n'
+        '                                    when (platform) {\n'
+        '                                        Platform.CALDAV, Platform.ETEBASE, Platform.GOOGLE_TASKS, Platform.MICROSOFT -> {\n'
+        '                                            backStack.push(PricingDestination(mode = PricingMode.NYP_ONLY, source = platform.name))\n'
+        '                                            return@AddAccountScreen\n'
+        '                                        }\n'
+        '                                        else -> {}\n'
+        '                                    }\n'
+        '                                }'
+    )
+    if block in src:
+        src = src.replace(block, '')
+        open(path, 'w', encoding='utf-8').write(src)
+        print(f"Patched {path}")
+    else:
+        print(f"Already patched or block not found in {path}")
+
+
 if __name__ == '__main__':
     patch_sync_runner()
     patch_add_account_screen()
+    patch_app_kt()
     print("Done.")

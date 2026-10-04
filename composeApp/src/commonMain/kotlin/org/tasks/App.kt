@@ -847,17 +847,7 @@ fun App(
                                     AnalyticsEvents.PARAM_SOURCE to "onboarding",
                                     AnalyticsEvents.PARAM_SELECTION to platform.name,
                                 )
-                                val sellsSubscriptions = configuration.billingProvider == org.tasks.billing.BillingProvider.PADDLE
-                                    || configuration.appStore == AppStore.APP_STORE
-                                if (sellsSubscriptions && !addAccountViewModel.hasPro) {
-                                    when (platform) {
-                                        Platform.CALDAV, Platform.ETEBASE, Platform.GOOGLE_TASKS, Platform.MICROSOFT -> {
-                                            backStack.push(PricingDestination(mode = PricingMode.NYP_ONLY, source = platform.name))
-                                            return@AddAccountScreen
-                                        }
-                                        else -> {}
-                                    }
-                                }
+
                                 when (platform) {
                                     Platform.TASKS_ORG -> if (
                                         subscriptionInfo?.isTasksSubscription == true
