@@ -59,6 +59,37 @@ def patch_add_account_screen():
         flags=re.DOTALL,
     )
 
+    # Add CALDAV/ETEBASE rendering cases to the freeAccounts when block.
+    # Without this, those platforms are in the list but render nothing (else -> {}).
+    caldav_etebase_cases = (
+        '                                    Platform.CALDAV -> AccountTypeRow(\n'
+        '                                        title = stringResource(Res.string.caldav),\n'
+        '                                        icon = Res.drawable.ic_webdav_logo,\n'
+        '                                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = .8f),\n'
+        '                                        description = stringResource(Res.string.caldav_selection_description),\n'
+        '                                        onClick = { signIn(Platform.CALDAV) },\n'
+        '                                    )\n'
+        '                                    Platform.ETEBASE -> AccountTypeRow(\n'
+        '                                        title = stringResource(Res.string.etesync),\n'
+        '                                        icon = Res.drawable.ic_etesync,\n'
+        '                                        description = stringResource(Res.string.etesync_selection_description),\n'
+        '                                        onClick = { signIn(Platform.ETEBASE) },\n'
+        '                                    )\n'
+    )
+    # Only touch the first `else -> {}` inside the freeAccounts section.
+    # Find the freeAccounts rendering block and patch its when block.
+    free_section_pattern = re.compile(
+        r'(freeAccounts\.forEachIndexed \{ index, platform ->.*?when \(platform\) \{.*?)'
+        r'(else -> \{\})',
+        re.DOTALL,
+    )
+    m = free_section_pattern.search(src)
+    if m:
+        src = src[:m.start(2)] + caldav_etebase_cases + '                                    ' + src[m.start(2):]
+        print(f"Added CALDAV/ETEBASE rendering cases in {path}")
+    else:
+        print(f"Could not find freeAccounts when block to patch in {path}")
+
     open(path, 'w', encoding='utf-8').write(src)
     print(f"Patched {path}")
 

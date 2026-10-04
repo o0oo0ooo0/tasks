@@ -240,6 +240,32 @@ fun AddAccountScreen(
                                         description = stringResource(Res.string.google_tasks_selection_description),
                                         onClick = { signIn(Platform.GOOGLE_TASKS) },
                                     )
+                                    Platform.CALDAV -> AccountTypeRow(
+                                        title = stringResource(Res.string.caldav),
+                                        icon = Res.drawable.ic_webdav_logo,
+                                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = .8f),
+                                        description = stringResource(Res.string.caldav_selection_description),
+                                        onClick = { signIn(Platform.CALDAV) },
+                                    )
+                                    Platform.ETEBASE -> AccountTypeRow(
+                                        title = stringResource(Res.string.etesync),
+                                        icon = Res.drawable.ic_etesync,
+                                        description = stringResource(Res.string.etesync_selection_description),
+                                        onClick = { signIn(Platform.ETEBASE) },
+                                    )
+                                                                        Platform.CALDAV -> AccountTypeRow(
+                                        title = stringResource(Res.string.caldav),
+                                        icon = Res.drawable.ic_webdav_logo,
+                                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = .8f),
+                                        description = stringResource(Res.string.caldav_selection_description),
+                                        onClick = { signIn(Platform.CALDAV) },
+                                    )
+                                    Platform.ETEBASE -> AccountTypeRow(
+                                        title = stringResource(Res.string.etesync),
+                                        icon = Res.drawable.ic_etesync,
+                                        description = stringResource(Res.string.etesync_selection_description),
+                                        onClick = { signIn(Platform.ETEBASE) },
+                                    )
                                     else -> {}
                                 }
                             }
