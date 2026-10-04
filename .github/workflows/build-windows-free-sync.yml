@@ -15,28 +15,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Unlock CalDAV / Etebase / Microsoft / Google Tasks sync
         shell: bash
         run: |
-          set -e
-          # 1) SyncRunner: always grant Pro so all sync adapters run without subscription
-          sed -i \
-            -e 's/val hasPro = hasTasksOrg || subscriptionProvider.subscription.first() != null/val hasPro = true/' \
-            -e 's/googleAndMicrosoftPro = hasPro || !subscriptionProvider.googleAndMicrosoftRequirePro,/googleAndMicrosoftPro = true,/' \
-            composeApp/src/commonMain/kotlin/org/tasks/sync/SyncRunner.kt
-
-          # 2) AddAccountScreen: treat Microsoft/Google/CalDAV/Etebase as free accounts
-          sed -i \
-            -e '/val isDesktop = configuration.billingProvider == BillingProvider.PADDLE/d' \
-            -e 's/if (configuration.supportsMicrosoft && !isDesktop) add(Platform.MICROSOFT)/if (configuration.supportsMicrosoft) add(Platform.MICROSOFT)/' \
-            -e 's/if (configuration.supportsGoogleTasks && !isDesktop) add(Platform.GOOGLE_TASKS)/if (configuration.supportsGoogleTasks) add(Platform.GOOGLE_TASKS)/' \
-            -e 's/if (configuration.supportsOpenTasks) add(Platform.DAVX5)/if (configuration.supportsOpenTasks) add(Platform.DAVX5)\n                    if (configuration.supportsCaldav) add(Platform.CALDAV)\n                    if (configuration.supportsEteSync) add(Platform.ETEBASE)/' \
-            -e '/if (configuration.supportsMicrosoft && isDesktop) add(Platform.MICROSOFT)/d' \
-            -e '/if (configuration.supportsGoogleTasks && isDesktop) add(Platform.GOOGLE_TASKS)/d' \
-            -e '/if (configuration.supportsCaldav) add(Platform.CALDAV)/d' \
-            -e '/if (configuration.supportsEteSync) add(Platform.ETEBASE)/d' \
-            kmp/src/commonMain/kotlin/org/tasks/compose/accounts/AddAccountScreen.kt
-
+          python .github/scripts/unlock-desktop-sync.py .
           echo "=== SyncRunner.kt ==="
           grep -n "val hasPro\|googleAndMicrosoftPro" composeApp/src/commonMain/kotlin/org/tasks/sync/SyncRunner.kt
           echo "=== AddAccountScreen.kt ==="
