@@ -43,6 +43,7 @@ jobs:
       - name: Build Windows MSI
         shell: bash
         run: |
+          ./gradlew clean
           ./gradlew packageMsi
 
       - name: Upload MSI
