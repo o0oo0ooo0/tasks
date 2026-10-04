@@ -1,0 +1,32 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build
+        run: .\gradlew.bat packageMsi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tasks-windows
+          path: |
+            **/*.msi
+            **/*.exe
