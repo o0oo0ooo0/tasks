@@ -57,13 +57,13 @@ class SyncRunner(
         if (!hasTasksOrg && !subscriptionProvider.awaitVerification()) {
             Logger.e(TAG) { "Could not confirm subscription, syncing without pro" }
         }
-        val hasPro = hasTasksOrg || subscriptionProvider.subscription.first() != null
+        val hasPro = true
         Logger.d(TAG) { "sync source=$source accounts=${accounts.size} pro=$hasPro" }
         pass(
             SyncPass(
                 accounts = accounts,
                 hasPro = hasPro,
-                googleAndMicrosoftPro = hasPro || !subscriptionProvider.googleAndMicrosoftRequirePro,
+                googleAndMicrosoftPro = true,
             )
         )
     }
